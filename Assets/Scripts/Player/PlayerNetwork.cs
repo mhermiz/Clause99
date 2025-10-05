@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
-public class CharacterController : NetworkBehaviour
+public class PlayerNetwork : NetworkBehaviour
 {
     [SerializeField] private Transform spawnedObjectprefab;
 
@@ -11,10 +11,10 @@ public class CharacterController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-            randomNumber.OnValueChanged += (int previousValue, int newValue) =>
-            {
-                Debug.Log(OwnerClientId + " - " + randomNumber.Value);
-            };
+        randomNumber.OnValueChanged += (int previousValue, int newValue) =>
+        {
+            Debug.Log(OwnerClientId + " - " + randomNumber.Value);
+        };
     }
 
     private void Update()
@@ -34,7 +34,7 @@ public class CharacterController : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Destroy(spawnedObjectprefab.gameObject);    
+            Destroy(spawnedObjectprefab.gameObject);
         }
 
         float moveHorizontal = Input.GetAxis("Horizontal");
