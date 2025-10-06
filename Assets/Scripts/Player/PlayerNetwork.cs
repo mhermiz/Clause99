@@ -34,7 +34,7 @@ public class CharacterController : NetworkBehaviour
 
         if (Input.GetKeyDown(KeyCode.Y))
         {
-            Destroy(spawnedObjectprefab.gameObject);    
+            DestroyImmediate(spawnedObjectprefab.gameObject, true);    
         }
 
         float moveHorizontal = Input.GetAxis("Horizontal");
