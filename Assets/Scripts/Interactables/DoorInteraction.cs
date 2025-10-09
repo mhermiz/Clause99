@@ -6,33 +6,49 @@ using UnityEngine;
 
 public class DoorInteraction : NetworkBehaviour, IInteractable
 {
-    public GameObject teleportPoint;
-    private Transform teleportPos;
+    [SerializeField] private GameObject teleportPoint;
 
     public void Interact(GameObject player)
     {
-        if (IsServer)
+        var playerNetObj = player.GetComponent<NetworkObject>();
+        if (playerNetObj == null) return;
+
+        // Client sends request to the server
+        if (!IsServer)
         {
-            teleportPos = teleportPoint.transform;
-            player.transform.position = teleportPos.position;
-            player.transform.rotation = teleportPos.rotation;
-        } else
+            InteractServerRpc(playerNetObj.OwnerClientId);
+        }
+        else
         {
-            InteractServerRpc(player.GetComponent<NetworkObject>().OwnerClientId);
+            // Host can handle directly
+            TeleportPlayerClientRpc(playerNetObj.OwnerClientId);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void InteractServerRpc(ulong ownerClientId)
+    private void InteractServerRpc(ulong clientId)
     {
-        Debug.Log($"[ServerRpc] Client {ownerClientId} requested door interaction");
-        
-        var playerObject = NetworkManager.Singleton.ConnectedClients[ownerClientId].PlayerObject.gameObject;
-        if (playerObject != null)
+        Debug.Log($"[ServerRpc] Received door interaction from client {clientId}");
+        TeleportPlayerClientRpc(clientId);
+    }
+
+    [ClientRpc]
+    private void TeleportPlayerClientRpc(ulong clientId)
+    {
+        // Only the targeted client should act
+        if (NetworkManager.Singleton.LocalClientId != clientId)
+            return;
+
+        Debug.Log($"[ClientRpc] Teleporting client {clientId}");
+
+        var player = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+        if (player == null)
         {
-            teleportPos = teleportPoint.transform;
-            playerObject.transform.position = teleportPos.position;
-            playerObject.transform.rotation = teleportPos.rotation;
+            Debug.LogWarning("Local player object not found for teleport.");
+            return;
         }
+
+        var teleportPos = teleportPoint.transform;
+        player.transform.SetPositionAndRotation(teleportPos.position, teleportPos.rotation);
     }
 }
