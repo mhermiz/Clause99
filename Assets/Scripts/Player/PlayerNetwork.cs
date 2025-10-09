@@ -37,12 +37,14 @@ public class CharacterController : NetworkBehaviour
             DestroyImmediate(spawnedObjectprefab.gameObject, true);    
         }
 
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
+        // Camera-relative movement
+        Vector3 forward = Camera.main.transform.forward;
+        Vector3 right = Camera.main.transform.right;
+        forward.y = right.y = 0;
 
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        Vector3 movement = forward * Input.GetAxis("Vertical") + right * Input.GetAxis("Horizontal");
 
         float movespeed = 5f;
-        transform.Translate(movement * Time.deltaTime * movespeed);
+        transform.Translate(movement.normalized * movespeed * Time.deltaTime, Space.World);
     }
 }
