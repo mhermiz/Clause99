@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 626263215110767828}
   - component: {fileID: 2167282018288703393}
   - component: {fileID: 367996226947297557}
+  - component: {fileID: 2238601195765115942}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -50,7 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3310360406
+  GlobalObjectIdHash: 940500057
   InScenePlacedSourceGlobalObjectIdHash: 940500057
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -87,6 +88,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnedObjectprefab: {fileID: 3690700104258420341, guid: 0deaffcfcac17b7458abac646c2c7e87, type: 3}
+  playerHeight: 7
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &626263215110767828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +162,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!136 &2238601195765115942
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077308932551355846}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.12295532
+  m_Height: 1.4378729
+  m_Direction: 1
+  m_Center: {x: -0.22244263, y: -2.959, z: -0.16339874}
 --- !u!1001 &8536116577664843849
 PrefabInstance:
   m_ObjectHideFlags: 0

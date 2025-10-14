@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2147994883970544079}
   - component: {fileID: 7976435881721061778}
   - component: {fileID: 264868078585850990}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4048224360
+  GlobalObjectIdHash: 1843944006
   InScenePlacedSourceGlobalObjectIdHash: 1843944006
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
