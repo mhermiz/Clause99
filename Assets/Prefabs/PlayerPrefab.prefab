@@ -87,6 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ffcf436af9efbb4daa91e4579b2cdce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pauseMenuUI: {fileID: 6928355958385121844, guid: 1d98156b0b7dd7a49902d04d4ffe0b20, type: 3}
   spawnedObjectprefab: {fileID: 3690700104258420341, guid: 0deaffcfcac17b7458abac646c2c7e87, type: 3}
   playerHeight: 7
   groundLayer:

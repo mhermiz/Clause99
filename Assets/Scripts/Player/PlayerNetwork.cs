@@ -1,11 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class CharacterController : NetworkBehaviour
+public class PlayerNetwork : NetworkBehaviour
 {
+    private GameObject pauseMenuUI;
+    public static bool isPaused = false;
     [SerializeField] private Transform spawnedObjectprefab;
     private Rigidbody rb;
     private CapsuleCollider col;
@@ -14,14 +17,13 @@ public class CharacterController : NetworkBehaviour
     [SerializeField] private LayerMask groundLayer;
     bool isGrounded;
 
-    private NetworkVariable<int> randomNumber = new NetworkVariable<int>(1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
-
     public override void OnNetworkSpawn()
     {
-        randomNumber.OnValueChanged += (int previousValue, int newValue) =>
+        if (IsOwner)
         {
-            Debug.Log(OwnerClientId + " - " + randomNumber.Value);
-        };
+            pauseMenuUI = GameObject.Find("PauseMenu");
+            pauseMenuUI.SetActive(false);
+        }
     }
 
     private void Awake()
@@ -45,9 +47,24 @@ public class CharacterController : NetworkBehaviour
             //randomNumber.Value = Random.Range(0, 100);//
         }
 
-        if (Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-            DestroyImmediate(spawnedObjectprefab.gameObject, true);
+            if (pauseMenuUI.activeSelf)
+            {
+                pauseMenuUI.SetActive(false);
+                isPaused = false;
+
+            }
+            else
+            {
+                pauseMenuUI.SetActive(true);
+                isPaused = true;
+            }
+        }
+
+        if (isPaused)
+        {
+            return; // Do not process movement when paused
         }
 
         // Jump input
@@ -67,12 +84,12 @@ public class CharacterController : NetworkBehaviour
         float movespeed = 5f;
         transform.Translate(movement.normalized * movespeed * Time.deltaTime, Space.World);
     }
-    
+
     private void Jump()
     {
         // reset y velocity
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         rb.AddForce(Vector3.up * 5f, ForceMode.Impulse);
-	}
+    }
 }

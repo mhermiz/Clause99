@@ -34,6 +34,8 @@ public class PlayerCamera : NetworkBehaviour
 
     private void Update()
     {
+        if (PlayerNetwork.isPaused) return;
+        
         if (IsOwner)
         {
             HandleCameraInput();
