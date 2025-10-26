@@ -9,13 +9,16 @@ public class PlayerNetwork : NetworkBehaviour
 {
     private GameObject pauseMenuUI;
     public static bool isPaused = false;
-    [SerializeField] private Transform spawnedObjectprefab;
     private Rigidbody rb;
     private CapsuleCollider col;
 
     [SerializeField] private float playerHeight;
     [SerializeField] private LayerMask groundLayer;
     bool isGrounded;
+
+    private float punchRange = 2f;
+    private float punchDamage = 10f;
+    [SerializeField] private LayerMask playerLayer; // Optional: Layer mask to filter punch hits
 
     public override void OnNetworkSpawn()
     {
@@ -38,13 +41,6 @@ public class PlayerNetwork : NetworkBehaviour
         if (!IsOwner)
         {
             return; // Only the owner can control the character
-        }
-
-        if (Input.GetKeyDown(KeyCode.T))
-        {
-            Transform spawnedObjectTransform = Instantiate(spawnedObjectprefab);
-            spawnedObjectTransform.GetComponent<NetworkObject>().Spawn(true);
-            //randomNumber.Value = Random.Range(0, 100);//
         }
 
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -81,8 +77,32 @@ public class PlayerNetwork : NetworkBehaviour
 
         Vector3 movement = forward * Input.GetAxis("Vertical") + right * Input.GetAxis("Horizontal");
 
-        float movespeed = 5f;
+        // Sprinting and stamina management
+        float movespeed;
+        if (Input.GetKey(KeyCode.LeftShift) && PlayerStats.stamina.Value > 0)
+        {
+            movespeed = 8f; // Sprint speed
+            PlayerStats.stamina.Value -= 20f * Time.deltaTime; // Reduce stamina while sprinting
+            Debug.Log($"{OwnerClientId} stamina reduced. Stamina now: {PlayerStats.stamina.Value}");
+        }
+        else
+        {
+            movespeed = 5f; // Normal speed
+        }
+
+        if (PlayerStats.stamina.Value < 100f && !Input.GetKey(KeyCode.LeftShift))
+        {
+            PlayerStats.stamina.Value += 10f * Time.deltaTime; // Regenerate stamina when not sprinting
+        }
+        
+        // Player Movement
         transform.Translate(movement.normalized * movespeed * Time.deltaTime, Space.World);
+
+        // Combat - Punch
+        if (Input.GetMouseButtonDown(0))
+        {
+            Punch();
+        }
     }
 
     private void Jump()
@@ -91,5 +111,25 @@ public class PlayerNetwork : NetworkBehaviour
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
 
         rb.AddForce(Vector3.up * 5f, ForceMode.Impulse);
+    }
+
+    private void Punch()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, punchRange, playerLayer))
+        {
+            Debug.Log($"[Punch] Hit player: {hit.collider.gameObject.name}");
+
+            var hitPlayerStats = hit.collider.gameObject.GetComponent<PlayerStats>();
+            if (hitPlayerStats != null)
+            {
+                hitPlayerStats.TakeDamageServerRpc(punchDamage);
+            }
+        }
+        else
+        {
+            Debug.Log("[Punch] Missed");
+        }
     }
 }

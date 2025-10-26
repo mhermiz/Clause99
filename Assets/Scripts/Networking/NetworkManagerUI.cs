@@ -9,9 +9,12 @@ public class NetworkManagerUI : MonoBehaviour
     [SerializeField] private Button serverBtn;
     [SerializeField] private Button hostBtn;
     [SerializeField] private Button clientBtn;
+    private GameObject NetworkUI;
 
     private void Awake()
     {
+        NetworkUI = GameObject.Find("NetworkUI");
+
         serverBtn.onClick.AddListener(() => {
             NetworkManager.Singleton.StartServer();
         });
