@@ -4,5 +4,7 @@ using UnityEngine;
 
 public interface IInteractable
 {
+
+    bool RequiresHold { get; }
     void Interact(GameObject player);
 }

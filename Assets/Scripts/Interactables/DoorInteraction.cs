@@ -6,6 +6,7 @@ using UnityEngine;
 
 public class DoorInteraction : NetworkBehaviour, IInteractable
 {
+    public bool RequiresHold => true;
     [SerializeField] private GameObject teleportPoint;
 
     public void Interact(GameObject player)

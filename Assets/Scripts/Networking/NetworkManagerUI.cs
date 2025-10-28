@@ -17,14 +17,17 @@ public class NetworkManagerUI : MonoBehaviour
 
         serverBtn.onClick.AddListener(() => {
             NetworkManager.Singleton.StartServer();
+            NetworkUI.SetActive(false);
         });
 
         hostBtn.onClick.AddListener(() => {
             NetworkManager.Singleton.StartHost();
+            NetworkUI.SetActive(false);
         });
 
         clientBtn.onClick.AddListener(() => {
             NetworkManager.Singleton.StartClient();
+            NetworkUI.SetActive(false);
         });
     }
 }

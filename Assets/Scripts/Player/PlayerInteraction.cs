@@ -7,9 +7,15 @@ public class PlayerInteraction : NetworkBehaviour
 {
     [SerializeField] private float interactionRange = 3f;
     [SerializeField] private float holdTime = 2f;
-    [SerializeField] private GameObject promptText;
+    private GameObject promptText;
     private float holdTimer = 0f;
     private IInteractable currentInteractable;
+
+    private void Start()
+    {
+        promptText = GameObject.Find("Interact");
+        promptText.SetActive(false);
+    }
 
     // Update is called once per frame
     void Update()
@@ -27,15 +33,26 @@ public class PlayerInteraction : NetworkBehaviour
             {
                 currentInteractable = interactable;
                 promptText.SetActive(true);
-                Debug.Log("Looking at interactable");
 
                 if (Input.GetKey(KeyCode.E))
                 {
-                    holdTimer += Time.deltaTime;
-                    if (holdTimer >= holdTime)
+                    if (currentInteractable.RequiresHold)
+                    {
+                        holdTimer += Time.deltaTime;
+                        if (holdTimer >= holdTime)
+                        {
+                            currentInteractable.Interact(gameObject);
+                            holdTimer = 0f; // Reset timer after interaction
+                        }
+                    }
+                    else
                     {
                         currentInteractable.Interact(gameObject);
-                        holdTimer = 0f; // Reset timer after interaction
+                        
+                        if (hit.collider.TryGetComponent(out NetworkObject netObj))
+                        {
+                            netObj.Despawn();
+                        }
                     }
                 }
                 else

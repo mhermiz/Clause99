@@ -20,12 +20,16 @@ public class PlayerNetwork : NetworkBehaviour
     private float punchDamage = 10f;
     [SerializeField] private LayerMask playerLayer; // Optional: Layer mask to filter punch hits
 
+    private PlayerStats stats;
+    private float staminaDelay = 0f;
+
     public override void OnNetworkSpawn()
     {
         if (IsOwner)
         {
             pauseMenuUI = GameObject.Find("PauseMenu");
             pauseMenuUI.SetActive(false);
+            stats = GetComponent<PlayerStats>();
         }
     }
 
@@ -79,20 +83,24 @@ public class PlayerNetwork : NetworkBehaviour
 
         // Sprinting and stamina management
         float movespeed;
-        if (Input.GetKey(KeyCode.LeftShift) && PlayerStats.stamina.Value > 0)
+        bool isMoving = Input.GetAxisRaw("Vertical") != 0 || Input.GetAxisRaw("Horizontal") != 0;
+
+        if (Input.GetKey(KeyCode.LeftShift) && isMoving && stats.TryConsumeStamina(20f * Time.deltaTime))
         {
             movespeed = 8f; // Sprint speed
-            PlayerStats.stamina.Value -= 20f * Time.deltaTime; // Reduce stamina while sprinting
-            Debug.Log($"{OwnerClientId} stamina reduced. Stamina now: {PlayerStats.stamina.Value}");
+            staminaDelay = 2f; // Reset delay
         }
         else
         {
             movespeed = 5f; // Normal speed
-        }
-
-        if (PlayerStats.stamina.Value < 100f && !Input.GetKey(KeyCode.LeftShift))
-        {
-            PlayerStats.stamina.Value += 10f * Time.deltaTime; // Regenerate stamina when not sprinting
+            if (staminaDelay > 0f)
+            {
+                staminaDelay -= Time.deltaTime;
+            }
+            else
+            {
+                stats.RegenerateStamina(10f * Time.deltaTime);
+            }
         }
         
         // Player Movement
