@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 367996226947297557}
   - component: {fileID: 2238601195765115942}
   - component: {fileID: -2259481634709841369}
+  - component: {fileID: 320204774169774934}
   m_Layer: 3
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -52,7 +53,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 940500057
+  GlobalObjectIdHash: 3310360406
   InScenePlacedSourceGlobalObjectIdHash: 940500057
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -75,7 +76,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionRange: 3
   holdTime: 2
-  promptText: {fileID: 8944072327251118689, guid: 3045f6e545d44204780701f5b9ca0ea7, type: 3}
 --- !u!114 &1474238050744926933
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,6 +200,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8020ce12ab4c4043837d7f28be18d69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &320204774169774934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4077308932551355846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56b0fdab9e6e0142aba60a4c8c01fc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dropPoint: {fileID: 0}
+  itemPrefab: {fileID: 0}
 --- !u!1001 &8536116577664843849
 PrefabInstance:
   m_ObjectHideFlags: 0
