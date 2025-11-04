@@ -10,11 +10,3 @@ public class ItemObjects : ScriptableObject
     [SerializeField] public GameObject prefab;
     [SerializeField] public Sprite item_sprite;
 }
-
-public static class ItemDatabase
-{
-    public static List<ItemObjects> AllItems = new List<ItemObjects>();
-
-    public static int GetItemID(ItemObjects obj) => AllItems.IndexOf(obj);
-    public static ItemObjects GetItemByID(int id) => AllItems[id];
-}

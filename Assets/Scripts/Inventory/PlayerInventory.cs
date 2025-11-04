@@ -11,6 +11,15 @@ public class PlayerInventory : NetworkBehaviour
     [SerializeField] private Transform dropPoint;
     [SerializeField] private GameObject itemPrefab;
 
+    [SerializeField] private HotbarUI hotbarUI;
+
+    private void Start()
+    {
+        if (hotbarUI == null)
+        {
+            hotbarUI = FindObjectOfType<HotbarUI>();
+        }
+    }
 
     private void Awake()
     {
@@ -20,14 +29,23 @@ public class PlayerInventory : NetworkBehaviour
 
     private void OnInventoryChanged(NetworkListEvent<int> change)
     {
-        // You can refresh UI or visuals here
         Debug.Log($"Inventory changed: now has {itemIDs.Count} items");
+         if (IsOwner && hotbarUI != null)
+        {
+            // copy NetworkList<int> to a regular List<int> without relying on IEnumerable conversion
+            var ids = new List<int>();
+            for (int i = 0; i < itemIDs.Count; i++)
+            {
+                ids.Add(itemIDs[i]);
+            }
+            hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
+        }
     }
     
     public override void OnNetworkSpawn()
     {
         itemIDs.OnListChanged += OnInventoryChanged;
-        
+
         if (!IsOwner) return;
         if (itemIDs.Count > 0)
             SelectItem(0);
@@ -70,7 +88,15 @@ public class PlayerInventory : NetworkBehaviour
         ItemObjects selectedItem = ItemDatabase.GetItemByID(itemIDs[selectedItemIndex]);
 
         Debug.Log($"Selected: {selectedItem}");
-        // 🔹 Optional: Update hotbar UI highlight or held object in hand here
+        if (hotbarUI != null)
+        {
+            var ids = new List<int>();
+            for (int i = 0; i < itemIDs.Count; i++)
+            {
+                ids.Add(itemIDs[i]);
+            }
+            hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
+        }
     }
 
     private void DropSelectedItem()

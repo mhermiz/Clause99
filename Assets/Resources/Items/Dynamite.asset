@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9cefcd4b46a88b489f64d62bcf1d835, type: 3}
   m_Name: Dynamite
   m_EditorClassIdentifier: 
-  cooldown: 0
-  itemType: 2
+  itemName: Dynamite
+  prefab: {fileID: 3580001855644210029, guid: 553b1a6d49f3d1e4c95343423617b571, type: 3}
   item_sprite: {fileID: 21300000, guid: 9cf0996ddcf0d8e4a8a268a48fa85c6f, type: 3}

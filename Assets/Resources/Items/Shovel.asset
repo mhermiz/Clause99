@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9cefcd4b46a88b489f64d62bcf1d835, type: 3}
   m_Name: Shovel
   m_EditorClassIdentifier: 
-  cooldown: 0
-  itemType: 1
+  itemName: Shovel
+  prefab: {fileID: 8272265021650874770, guid: c0b63d2bf8d42a149ae5dd625d7f177b, type: 3}
   item_sprite: {fileID: 21300000, guid: ab6f87e84f83b7348be4acf00cad6e10, type: 3}

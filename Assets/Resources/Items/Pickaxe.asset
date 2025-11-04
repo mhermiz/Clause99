@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9cefcd4b46a88b489f64d62bcf1d835, type: 3}
   m_Name: Pickaxe
   m_EditorClassIdentifier: 
-  cooldown: 0
-  itemType: 0
+  itemName: Pickaxe
+  prefab: {fileID: 5416496404539692353, guid: 75e8a9877eb53d047ae7ee1bf85f14cb, type: 3}
   item_sprite: {fileID: 21300000, guid: 0adbae2cd4616594b86ee2d7e4208dc7, type: 3}
