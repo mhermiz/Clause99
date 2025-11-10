@@ -64,4 +64,9 @@ public class ToolInteraction : NetworkBehaviour, IInteractable
         inventory.AddItem(toolItem);
         Debug.Log($"Tool {toolItem} added to inventory of client {clientId}");
     }
+
+    public void AssignItem(ItemObjects item)
+    {
+        toolItem = item;
+    }
 }

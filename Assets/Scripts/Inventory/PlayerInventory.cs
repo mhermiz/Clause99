@@ -9,16 +9,14 @@ public class PlayerInventory : NetworkBehaviour
     private int selectedItemIndex = 0;
 
     [SerializeField] private Transform dropPoint;
-    [SerializeField] private GameObject itemPrefab;
+    [SerializeField] private Transform handSlot;
+    [SerializeField] private GameObject currentHeldItem;
 
     [SerializeField] private HotbarUI hotbarUI;
 
     private void Start()
     {
-        if (hotbarUI == null)
-        {
-            hotbarUI = FindObjectOfType<HotbarUI>();
-        }
+        hotbarUI = FindObjectOfType<HotbarUI>();
     }
 
     private void Awake()
@@ -97,6 +95,29 @@ public class PlayerInventory : NetworkBehaviour
             }
             hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
         }
+
+        UpdateHeldItem(selectedItem);
+    }
+
+    private void UpdateHeldItem(ItemObjects selectedItem)
+    {
+    // Remove old held item
+    if (currentHeldItem != null)
+        Destroy(currentHeldItem);
+
+    if (selectedItem == null || selectedItem.prefab == null)
+        return;
+
+    // Instantiate the item in the hand slot
+    currentHeldItem = Instantiate(selectedItem.prefab, handSlot);
+
+    // Adjust its local transform if needed
+    currentHeldItem.transform.localPosition = Vector3.zero;
+    currentHeldItem.transform.localRotation = Quaternion.identity;
+
+    // disable colliders so it doesn’t hit the player
+    foreach (var col in currentHeldItem.GetComponentsInChildren<Collider>())
+        col.enabled = false;
     }
 
     private void DropSelectedItem()
@@ -124,6 +145,11 @@ public class PlayerInventory : NetworkBehaviour
         // Create dropped item
         var droppedItemData = ItemDatabase.GetItemByID(itemID);
         GameObject dropped = Instantiate(droppedItemData.prefab.gameObject, dropPoint.position, Quaternion.identity);
+
+        var toolInteraction = dropped.GetComponent<ToolInteraction>();
+        if (toolInteraction != null)
+            toolInteraction.AssignItem(droppedItemData);
+        
         dropped.GetComponent<NetworkObject>().Spawn(true);
     }
 
