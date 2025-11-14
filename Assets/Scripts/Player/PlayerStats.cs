@@ -10,7 +10,7 @@ public class PlayerStats : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        if (IsOwner)
+        if (IsServer)
         {
             health.Value = 100f;
             stamina.Value = 100f;

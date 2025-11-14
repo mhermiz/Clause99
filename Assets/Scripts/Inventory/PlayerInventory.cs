@@ -7,6 +7,7 @@ public class PlayerInventory : NetworkBehaviour
 {
     private NetworkList<int> itemIDs; // holds item IDs
     private int selectedItemIndex = 0;
+    private NetworkVariable<int> equippedItemID = new NetworkVariable<int>(-1);
 
     [SerializeField] private Transform dropPoint;
     [SerializeField] private Transform handSlot;
@@ -16,7 +17,8 @@ public class PlayerInventory : NetworkBehaviour
 
     private void Start()
     {
-        hotbarUI = FindObjectOfType<HotbarUI>();
+        if (IsOwner)
+            hotbarUI = FindObjectOfType<HotbarUI>();
     }
 
     private void Awake()
@@ -28,7 +30,7 @@ public class PlayerInventory : NetworkBehaviour
     private void OnInventoryChanged(NetworkListEvent<int> change)
     {
         Debug.Log($"Inventory changed: now has {itemIDs.Count} items");
-         if (IsOwner && hotbarUI != null)
+        if (IsOwner && hotbarUI != null)
         {
             // copy NetworkList<int> to a regular List<int> without relying on IEnumerable conversion
             var ids = new List<int>();
@@ -39,14 +41,42 @@ public class PlayerInventory : NetworkBehaviour
             hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
         }
     }
-    
+
+    private void OnEquippedItemChanged(int oldValue, int newValue)
+    {
+        // Local owner already handles visuals
+        if (IsOwner) return;
+
+        // Remove held item if unequipped
+        if (newValue == -1)
+        {
+            if (currentHeldItem != null)
+            {
+                Destroy(currentHeldItem);
+                currentHeldItem = null;
+            }
+            return;
+        }
+
+        // Update held item for remote players
+        ItemObjects newItem = ItemDatabase.GetItemByID(newValue);
+        UpdateHeldItem(newItem);
+    }
+
     public override void OnNetworkSpawn()
     {
         itemIDs.OnListChanged += OnInventoryChanged;
+        equippedItemID.OnValueChanged += OnEquippedItemChanged;
 
         if (!IsOwner) return;
         if (itemIDs.Count > 0)
             SelectItem(0);
+    }
+    
+    public override void OnNetworkDespawn()
+    {
+        itemIDs.OnListChanged -= OnInventoryChanged;
+        equippedItemID.OnValueChanged -= OnEquippedItemChanged;
     }
 
     private void Update()
@@ -64,7 +94,15 @@ public class PlayerInventory : NetworkBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1 + i))
             {
-                SelectItem(i);
+                // if the same slot is pressed again
+                if (selectedItemIndex == i && currentHeldItem != null)
+                {
+                    UnequipItem();
+                }
+                else
+				{
+				    SelectItem(i);
+				}
                 break;
             }
         }
@@ -78,14 +116,11 @@ public class PlayerInventory : NetworkBehaviour
         }
     }
 
-    private void SelectItem(int index)
+    private void UnequipItem()
     {
-        if (index < 0 || index >= itemIDs.Count) return;
-
-        selectedItemIndex = index;
-        ItemObjects selectedItem = ItemDatabase.GetItemByID(itemIDs[selectedItemIndex]);
-
-        Debug.Log($"Selected: {selectedItem}");
+        selectedItemIndex = -1;
+        equippedItemID.Value = -1; // broadcast unequip
+        Debug.Log("Unequipped item");
         if (hotbarUI != null)
         {
             var ids = new List<int>();
@@ -96,7 +131,40 @@ public class PlayerInventory : NetworkBehaviour
             hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
         }
 
-        UpdateHeldItem(selectedItem);
+        // Remove held item
+        if (currentHeldItem != null) {
+            Destroy(currentHeldItem);
+            currentHeldItem = null;
+        }
+    }
+
+    private void SelectItem(int index)
+    {
+        if (index < 0 || index >= itemIDs.Count) return;
+
+        selectedItemIndex = index;
+        int itemID = itemIDs[selectedItemIndex];
+        equippedItemID.Value = itemID; // sync across network
+
+        ItemObjects selectedItem = ItemDatabase.GetItemByID(itemIDs[selectedItemIndex]);
+        if (selectedItem == null)
+        {
+            return;
+        }
+
+        Debug.Log($"Selected: {selectedItem}");
+        if (IsOwner && hotbarUI != null)
+        {
+            var ids = new List<int>();
+            for (int i = 0; i < itemIDs.Count; i++)
+            {
+                ids.Add(itemIDs[i]);
+            }
+            hotbarUI.UpdateHotbarSprites(ids, selectedItemIndex);
+        }
+
+        if (IsOwner)
+            UpdateHeldItem(selectedItem);
     }
 
     private void UpdateHeldItem(ItemObjects selectedItem)
@@ -142,10 +210,17 @@ public class PlayerInventory : NetworkBehaviour
 
     private void SpawnDroppedItem(int itemID)
     {
+        // Remove held item if it's the one being dropped
+        if (currentHeldItem != null)
+		{
+			Destroy(currentHeldItem);
+            currentHeldItem = null;
+		}
+
         // Create dropped item
         var droppedItemData = ItemDatabase.GetItemByID(itemID);
         GameObject dropped = Instantiate(droppedItemData.prefab.gameObject, dropPoint.position, Quaternion.identity);
-
+        
         var toolInteraction = dropped.GetComponent<ToolInteraction>();
         if (toolInteraction != null)
             toolInteraction.AssignItem(droppedItemData);

@@ -7,14 +7,26 @@ public class PlayerInteraction : NetworkBehaviour
 {
     [SerializeField] private float interactionRange = 3f;
     [SerializeField] private float holdTime = 2f;
-    private GameObject promptText;
+    [SerializeField] private GameObject promptText;
     private float holdTimer = 0f;
     private IInteractable currentInteractable;
 
     private void Start()
     {
-        promptText = GameObject.Find("Interact");
-        promptText.SetActive(false);
+        // Try to find the Interact UI text that exists in the PlayerUI canvas
+        if (promptText == null)
+        {
+            var uiRoot = GameObject.Find("PlayerUI");
+            if (uiRoot != null)
+            {
+                promptText = uiRoot.transform.Find("Interact")?.gameObject;
+            }
+        }
+
+        if (promptText != null)
+        {
+            promptText.SetActive(false);
+        }
     }
 
     // Update is called once per frame
@@ -48,10 +60,10 @@ public class PlayerInteraction : NetworkBehaviour
                     else
                     {
                         currentInteractable.Interact(gameObject);
-                        
+
                         if (hit.collider.TryGetComponent(out NetworkObject netObj))
                         {
-                            netObj.Despawn();
+                            DespawnObjectServerRpc(netObj.NetworkObjectId);
                         }
                     }
                 }
@@ -72,6 +84,15 @@ public class PlayerInteraction : NetworkBehaviour
             promptText.SetActive(false);
             currentInteractable = null;
             holdTimer = 0f; // Reset timer if nothing is hit
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void DespawnObjectServerRpc(ulong networkObjectId)
+    {
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out NetworkObject netObj))
+        {
+            netObj.Despawn();
         }
     }
 }

@@ -79,7 +79,7 @@ public class PlayerNetwork : NetworkBehaviour
         Vector3 right = Camera.main.transform.right;
         forward.y = right.y = 0;
 
-        Vector3 movement = forward * Input.GetAxis("Vertical") + right * Input.GetAxis("Horizontal");
+        Vector3 movement = forward * Input.GetAxisRaw("Vertical") + right * Input.GetAxisRaw("Horizontal");
 
         // Sprinting and stamina management
         float movespeed;
@@ -104,7 +104,7 @@ public class PlayerNetwork : NetworkBehaviour
         }
         
         // Player Movement
-        transform.Translate(movement.normalized * movespeed * Time.deltaTime, Space.World);
+        rb.MovePosition(rb.position + movement.normalized * movespeed * Time.deltaTime);
 
         // Combat - Punch
         if (Input.GetMouseButtonDown(0))
