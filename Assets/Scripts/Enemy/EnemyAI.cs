@@ -22,6 +22,9 @@ public class EnemyAI : MonoBehaviour
     public float sightRange, attackRange;
     public bool playerInSightRange, playerInAttackRange;
 
+    //Stats
+    private PlayerStats playerStats;
+
     private void Awake()
     {
         Debug.Log("EnemyAI Awake called");
@@ -37,6 +40,7 @@ public class EnemyAI : MonoBehaviour
             if (p != null)
             {
                 player = p.transform;
+                playerStats = p.GetComponent<PlayerStats>();
                 Debug.Log("Enemy found the player!");
                 yield break;
             }
@@ -97,6 +101,12 @@ public class EnemyAI : MonoBehaviour
         if (!alreadyAttacked)
         {
             //Attack code here
+            if (playerStats != null)
+            {
+                float damageAmount = 10f; // Set how much damage you want
+                playerStats.TakeDamageServerRpc(damageAmount);
+                Debug.Log($"Enemy dealt {damageAmount} damage to {player.name}");
+            }
             Debug.Log("Enemy Attacks!");
 
             alreadyAttacked = true;

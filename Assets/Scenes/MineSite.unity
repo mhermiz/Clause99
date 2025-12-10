@@ -807,6 +807,8 @@ MonoBehaviour:
   - {fileID: -4050806667932485953, guid: 2b41853036497ac4fa1d212a15ccff4c, type: 3}
   length: 100
   startPosition: {x: 1439.6, y: -79.30723, z: 45.3}
+  enemyPrefab: {fileID: 1545414732}
+  enemySpawnChance: 0.15
 --- !u!4 &301336574
 Transform:
   m_ObjectHideFlags: 0

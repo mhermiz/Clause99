@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class MapGenerator : MonoBehaviour
     public int length = 20;          // How many pieces to generate
     public Vector3 startPosition;
     private Module lastModule;
+    public GameObject enemyPrefab;
+    public float enemySpawnChance = 0.3f; // 30% chance to spawn an enemy in a module
 
     void Start()
     {
@@ -22,7 +25,18 @@ public class MapGenerator : MonoBehaviour
         for (int i = 1; i < length; i++)
         {
             AddNextModule();
+
+            // Randomly spawn enemy in the module
+            if (Random.value < enemySpawnChance)
+            {
+                Vector3 enemySpawnPos = lastModule.transform.position + new Vector3(0, 0, 0); // Adjust as needed
+                Instantiate(enemyPrefab, enemySpawnPos, Quaternion.identity);
+            }
         }
+
+        // rebuild navmesh after map is ready
+        NavMeshSurface surface = FindObjectOfType<NavMeshSurface>();
+        surface.BuildNavMesh();
     }
 
     void AddNextModule()
