@@ -125,9 +125,16 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 128
+  equippedItem: {fileID: 0}
   playerLayer:
     serializedVersion: 2
     m_Bits: 8
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!114 &626263215110767828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -235,6 +242,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   healthBar: {fileID: 0}
   staminaBar: {fileID: 0}
+  mineralsCarried:
+    m_InternalValue: 0
+  mineralCapacity: 32
+  playerScore:
+    m_InternalValue: 0
 --- !u!114 &320204774169774934
 MonoBehaviour:
   m_ObjectHideFlags: 0

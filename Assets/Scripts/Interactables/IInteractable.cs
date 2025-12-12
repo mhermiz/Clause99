@@ -7,4 +7,5 @@ public interface IInteractable
 
     bool RequiresHold { get; }
     void Interact(GameObject player);
+    bool ShouldDespawnAfterInteract { get; }
 }

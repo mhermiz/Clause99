@@ -11,12 +11,12 @@ TagManager:
   - Player
   - Water
   - UI
-  - 
+  - Enemy
   - groundLayer
   - WhatIsGround
   - WhatIsWall
   - WhatIsPlayer
-  - 
+  - Ores
   - 
   - 
   - 

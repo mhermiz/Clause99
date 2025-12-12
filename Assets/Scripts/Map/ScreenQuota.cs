@@ -4,23 +4,47 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
-public class ScreenQuota : NetworkBehaviour
+public class ScreenQuota : MonoBehaviour
 {
-    [SerializeField] private TMP_Text quotaText;
-    private NetworkVariable<int> currentQuota = new NetworkVariable<int>(5);
+    [SerializeField] private TMP_Text scoreText;
+    private PlayerStats localPlayer;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
-        currentQuota.OnValueChanged += (int previousValue, int newValue) =>
+        StartCoroutine(FindlocalPlayerWhenReady());
+        if (localPlayer != null)
         {
-            quotaText.text = newValue.ToString();
-        };
+            
+        }
     }
 
-    [ServerRpc]
-    public void IncreaseQuotaServerRpc(int amount)
+    private IEnumerator FindlocalPlayerWhenReady()
     {
-        currentQuota.Value += amount;
+        while (localPlayer == null)
+        {
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p != null)
+            {
+                localPlayer = p.GetComponent<PlayerStats>();
+                Debug.Log("Stats found localPlayer!");
+                // Subscribe to changes in the NetworkVariable
+                localPlayer.playerScore.OnValueChanged += OnScoreChanged;
+                UpdateUI(localPlayer.playerScore.Value);
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.2f); // try again
+        }
+    }
+
+    private void OnScoreChanged(int oldValue, int newValue)
+    {
+        UpdateUI(newValue);
+    }
+
+    private void UpdateUI(int score)
+    {
+        if (scoreText != null)
+            scoreText.text = "Score: " + score;
     }
 }

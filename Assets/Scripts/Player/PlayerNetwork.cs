@@ -16,9 +16,11 @@ public class PlayerNetwork : NetworkBehaviour
     [SerializeField] private LayerMask groundLayer;
     bool isGrounded;
 
-    private float punchRange = 2f;
-    private float punchDamage = 10f;
+    private float lastAttackTime = 0f;
+    public ItemObjects equippedItem;
     [SerializeField] private LayerMask playerLayer; // Optional: Layer mask to filter punch hits
+    [SerializeField] private LayerMask enemyLayer; // Layer mask to filter enemy hits
+    [SerializeField] private LayerMask interactableLayer; // Layer mask to filter interactable hits
 
     private PlayerStats stats;
     private float staminaDelay = 0f;
@@ -109,7 +111,7 @@ public class PlayerNetwork : NetworkBehaviour
         // Combat - Punch
         if (Input.GetMouseButtonDown(0))
         {
-            Punch();
+            Attack();
         }
     }
 
@@ -121,23 +123,83 @@ public class PlayerNetwork : NetworkBehaviour
         rb.AddForce(Vector3.up * 5f, ForceMode.Impulse);
     }
 
-    private void Punch()
+    private void Attack()
     {
-        RaycastHit hit;
-
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, punchRange, playerLayer))
+        // No item = punching players only
+        if (equippedItem == null)
         {
-            Debug.Log($"[Punch] Hit player: {hit.collider.gameObject.name}");
+            Debug.Log("Punch!");
+            TryDealDamageToPlayer(2f, 10f); 
+            return;
+        }
 
-            var hitPlayerStats = hit.collider.gameObject.GetComponent<PlayerStats>();
-            if (hitPlayerStats != null)
+        // Only allow enemy attacks for a shovel
+        if (equippedItem.toolType == ToolType.Shovel)
+        {
+            Debug.Log("Shovel Attack!");
+            if (Time.time < lastAttackTime + equippedItem.cooldown)
+            return;
+            lastAttackTime = Time.time;
+            TryDealDamageToEnemy(2f, 10f);
+            return;
+        }
+
+        // Only allow pickaxe attacks
+        if (equippedItem.toolType == ToolType.Pickaxe)
+        {
+            Debug.Log("Pickaxe Attack!");
+            if (Time.time < lastAttackTime + equippedItem.cooldown)
+            return;
+            lastAttackTime = Time.time;
+            TryDealDamageToOres(2f, 10f);
+            return;
+        }
+    }
+
+    private void TryDealDamageToPlayer(float range, float damage)
+    {
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, range))
+        {
+            if (hit.collider.TryGetComponent<PlayerStats>(out var stats))
             {
-                hitPlayerStats.TakeDamageServerRpc(punchDamage);
+                stats.TakeDamageServerRpc(damage);
             }
         }
-        else
+    }
+
+    private void TryDealDamageToEnemy(float range, float damage)
+    {   
+        Debug.Log("Trying to deal damage to enemy");
+        if (Physics.Raycast (
+            Camera.main.transform.position,
+            Camera.main.transform.forward,
+            out RaycastHit hit,
+            range,
+            enemyLayer
+        ))
         {
-            Debug.Log("[Punch] Missed");
+            if (hit.collider.TryGetComponent<EnemyHealth>(out var enemy))
+            {
+                enemy.TakeDamage(damage);
+            }
+        }
+    }
+
+    private void TryDealDamageToOres(float range, float damage)
+    {   
+        Debug.Log("Trying to deal damage to ore");
+        if (Physics.Raycast (
+            Camera.main.transform.position,
+            Camera.main.transform.forward,
+            out RaycastHit hit,
+            range,
+            interactableLayer
+        ))
+        {
+            if (hit.collider.TryGetComponent<OreHealth>(out var mineral))
+            {
+                mineral.TakeDamage(damage);
+            }
         }
     }
 }

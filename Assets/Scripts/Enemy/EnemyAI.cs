@@ -96,7 +96,8 @@ public class EnemyAI : MonoBehaviour
 		//Make sure enemy doesn't move
         agent.SetDestination(transform.position);
 
-        transform.LookAt(player);
+        Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0; // ignore vertical difference
 
         if (!alreadyAttacked)
         {

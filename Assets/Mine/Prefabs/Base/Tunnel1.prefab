@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 23765492774163710}
   - component: {fileID: 64099579492408300}
   - component: {fileID: 4986473884565395770}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tunnel1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7117891332041231490}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6074744116667458631}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}

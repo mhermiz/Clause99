@@ -61,7 +61,7 @@ public class PlayerInteraction : NetworkBehaviour
                     {
                         currentInteractable.Interact(gameObject);
 
-                        if (hit.collider.TryGetComponent(out NetworkObject netObj))
+                        if (currentInteractable.ShouldDespawnAfterInteract && hit.collider.TryGetComponent(out NetworkObject netObj))
                         {
                             DespawnObjectServerRpc(netObj.NetworkObjectId);
                         }

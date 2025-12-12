@@ -11,6 +11,13 @@ public class PlayerStats : NetworkBehaviour
     private NetworkVariable<float> stamina = new NetworkVariable<float>(100f);
     private const float maxHealth = 100f;
     private const float maxStamina = 100f;
+
+    public NetworkVariable<int> mineralsCarried = new NetworkVariable<int>(0);
+    public int mineralCapacity = 32;
+    public bool CanCarryMore() => mineralsCarried.Value < mineralCapacity;
+
+    public NetworkVariable<int> playerScore = new NetworkVariable<int>(0);
+    private DamageFlash damageFlash;
     
     public override void OnNetworkSpawn()
     {
@@ -46,6 +53,8 @@ public class PlayerStats : NetworkBehaviour
                 }
             }
 
+            damageFlash = GameObject.Find("DamageOverlay").GetComponent<DamageFlash>();
+
             // Subscribe to health change events
             health.OnValueChanged += OnHealthChanged;
             stamina.OnValueChanged += OnStaminaChanged;
@@ -72,6 +81,16 @@ public class PlayerStats : NetworkBehaviour
         if (!IsServer) return;
         health.Value -= damage;
         Debug.Log($"{OwnerClientId} took {damage} damage. Health now: {health.Value}");
+        FlashDamageClientRpc(OwnerClientId);
+    }
+
+    [ClientRpc]
+    private void FlashDamageClientRpc(ulong clientId)
+    {
+        if (IsLocalPlayer && damageFlash)
+        {
+            damageFlash.Flash();
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -98,5 +117,18 @@ public class PlayerStats : NetworkBehaviour
             ChangeStaminaServerRpc(amount);
             Debug.Log($"{OwnerClientId} stamina gained. Stamina now: {stamina.Value}");
         }
+    }
+
+    public void AddMineral(int amount = 1)
+    {
+        mineralsCarried.Value = Mathf.Min(mineralsCarried.Value + amount, mineralCapacity);
+    }
+
+    public int DepositAllMinerals()
+    {
+        int deposited = mineralsCarried.Value;
+        mineralsCarried.Value = 0;
+        playerScore.Value += deposited;
+        return deposited;
     }
 }

@@ -14,17 +14,36 @@ public class PlayerInventory : NetworkBehaviour
     [SerializeField] private GameObject currentHeldItem;
 
     [SerializeField] private HotbarUI hotbarUI;
+    private PlayerNetwork playerNetwork;
 
     private void Start()
     {
-        if (IsOwner)
+        if (IsOwner) {
             hotbarUI = FindObjectOfType<HotbarUI>();
+            StartCoroutine(FindPlayerNetworkWhenReady());
+        }
     }
 
     private void Awake()
     {
         itemIDs = new NetworkList<int>();
         itemIDs.OnListChanged += OnInventoryChanged;
+    }
+
+    private IEnumerator FindPlayerNetworkWhenReady()
+    {
+        while (playerNetwork == null)
+        {
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p != null)
+            {
+                playerNetwork = p.GetComponent<PlayerNetwork>();
+                Debug.Log("Inventory found PlayerNetwork!");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.2f); // try again
+        }
     }
 
     private void OnInventoryChanged(NetworkListEvent<int> change)
@@ -120,6 +139,7 @@ public class PlayerInventory : NetworkBehaviour
     {
         selectedItemIndex = -1;
         equippedItemID.Value = -1; // broadcast unequip
+        playerNetwork.equippedItem = null;
         Debug.Log("Unequipped item");
         if (hotbarUI != null)
         {
@@ -151,7 +171,8 @@ public class PlayerInventory : NetworkBehaviour
         {
             return;
         }
-
+        
+        playerNetwork.equippedItem = selectedItem;
         Debug.Log($"Selected: {selectedItem}");
         if (IsOwner && hotbarUI != null)
         {

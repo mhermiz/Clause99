@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 23923456109681942}
   - component: {fileID: 64081020325562066}
   - component: {fileID: 1474570357572169270}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: RampUp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8469198051682921386}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5187682253645875752}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}

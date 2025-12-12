@@ -4,12 +4,21 @@ using Unity.Netcode;
 using UnityEngine;
 using TMPro;
 
+public enum MineralInteractionType
+{
+    Collect,   // pick up minerals
+    Deposit    // deposit minerals
+}
+
 public class MineralInteraction : NetworkBehaviour, IInteractable
 {
     private TMP_Text mineralWeigh;
-    public bool RequiresHold => false;
-    private int counter = 0;
-    private int capacity = 32;
+
+    [Header("Set whether this object is a collection node or deposit station")]
+    public MineralInteractionType interactionType = MineralInteractionType.Collect;
+
+    public bool ShouldDespawnAfterInteract => interactionType == MineralInteractionType.Collect;
+    public bool RequiresHold => interactionType == MineralInteractionType.Deposit;
 
     private void Start()
     {
@@ -19,47 +28,58 @@ public class MineralInteraction : NetworkBehaviour, IInteractable
 
     public void Interact(GameObject player)
     {
-        var playerNetObj = player.GetComponent<NetworkObject>();
-        if (playerNetObj == null) return;
+        var playerStats = player.GetComponent<PlayerStats>();
+        if (playerStats == null) return;
 
         // Client sends request to the server
         if (!IsServer)
         {
-            InteractServerRpc(playerNetObj.OwnerClientId);
+            InteractServerRpc(playerStats.GetComponent<NetworkObject>().OwnerClientId);
         }
         else
         {
             // Host can handle directly
-            MineralPickupClientRpc(playerNetObj.OwnerClientId);
+            HandleInteraction(playerStats);
         }
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void InteractServerRpc(ulong clientId)
     {
-        Debug.Log($"[ServerRpc] Received mineral interaction from client {clientId}");
-        MineralPickupClientRpc(clientId);
+        var player = NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(clientId).gameObject;
+        var stats = player.GetComponent<PlayerStats>();
+        if (stats != null)
+        {
+            HandleInteraction(stats);
+        }
     }
 
-    [ClientRpc]
-    private void MineralPickupClientRpc(ulong clientId)
+    private void HandleInteraction(PlayerStats playerStats)
     {
-        // Only the targeted client should act
-        if (NetworkManager.Singleton.LocalClientId != clientId)
-            return;
-
-        Debug.Log($"[ClientRpc] Mineral picked up by client {clientId}");
-
-        var player = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
-        if (player == null)
+        switch (interactionType)
         {
-            Debug.LogWarning("Local player object not found for mineral pickup.");
-            return;
+            case MineralInteractionType.Collect:
+                if (playerStats.CanCarryMore())
+                {
+                    playerStats.AddMineral();
+                    Debug.Log($"Collected! Player now has {playerStats.mineralsCarried.Value}");
+                }
+                else
+                {
+                    Debug.Log("Mineral capacity full!");
+                }
+                break;
+
+            case MineralInteractionType.Deposit:
+                int deposited = playerStats.DepositAllMinerals();
+                Debug.Log($"Deposited {deposited} minerals!");
+                break;
         }
 
-        // Here you can add logic to update player's inventory or stats
-        Debug.Log("Mineral added to player's inventory.");
-        counter++;
-        mineralWeigh.text = + counter + "/" + capacity;
+        // Update the UI for the local player
+        if (NetworkManager.Singleton.LocalClientId == playerStats.OwnerClientId && mineralWeigh != null)
+        {
+            mineralWeigh.text = $"{playerStats.mineralsCarried.Value}/{playerStats.mineralCapacity}";
+        }
     }
 }

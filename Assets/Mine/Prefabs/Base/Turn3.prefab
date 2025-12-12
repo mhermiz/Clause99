@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 23495079155067526}
   - component: {fileID: 64630229918947760}
   - component: {fileID: 1143569595273529270}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Turn3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -133,7 +133,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5981188192456332879}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Entrance (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -164,7 +164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2060664928562001438}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -195,7 +195,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8992694669305584233}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}

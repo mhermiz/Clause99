@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 23141483765397022}
   - component: {fileID: 64261010050284302}
   - component: {fileID: -4050806667932485953}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: TurnR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,7 +132,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6681038252599071676}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,7 +163,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6371024168717286891}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Entrance
   m_TagString: Untagged
   m_Icon: {fileID: 0}

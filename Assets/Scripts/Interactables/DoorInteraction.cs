@@ -7,8 +7,17 @@ using UnityEngine;
 public class DoorInteraction : NetworkBehaviour, IInteractable
 {
     public bool RequiresHold => true;
+    public bool ShouldDespawnAfterInteract => false;
     [SerializeField] private GameObject teleportPoint;
 
+    private void Awake()
+    {
+        if (teleportPoint == null)
+        {
+            teleportPoint = GameObject.Find("SpawnPosition2");
+            Debug.LogWarning("Teleport point not assigned in DoorInteraction.");
+        }
+    }
     public void Interact(GameObject player)
     {
         var playerNetObj = player.GetComponent<NetworkObject>();

@@ -8,6 +8,7 @@ public class ToolInteraction : NetworkBehaviour, IInteractable
 {
     [SerializeField] private ItemObjects toolItem;
     public bool RequiresHold => false;
+    public bool ShouldDespawnAfterInteract => true;
 
     public void Interact(GameObject player)
     {
