@@ -13,3 +13,8 @@
   Attack System,
   Multiplayer System
   
+# Itch.io Build
+  https://badmano.itch.io/clause99
+
+# Video Demo
+  https://www.youtube.com/watch?v=LHsKAK8g_Bc
