@@ -5,11 +5,11 @@
   Used Unity and Blender (Utilzed aspects of Unity Netcode)
 
 # Features
-  Inventory System
-  Stats System
-  Enemy System
-  Map Generation System
-  Mining System
-  Attack System
+  Inventory System,
+  Stats System,
+  Enemy System,
+  Map Generation System,
+  Mining System,
+  Attack System,
   Multiplayer System
   
