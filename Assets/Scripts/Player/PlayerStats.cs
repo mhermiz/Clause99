@@ -18,6 +18,8 @@ public class PlayerStats : NetworkBehaviour
 
     public NetworkVariable<int> playerScore = new NetworkVariable<int>(0);
     private DamageFlash damageFlash;
+    private GameObject deathMenuUI;
+    private bool isDead = false;
     
     public override void OnNetworkSpawn()
     {
@@ -54,6 +56,8 @@ public class PlayerStats : NetworkBehaviour
             }
 
             damageFlash = GameObject.Find("DamageOverlay").GetComponent<DamageFlash>();
+            deathMenuUI = GameObject.Find("DeathMenu");
+            deathMenuUI.SetActive(false);
 
             // Subscribe to health change events
             health.OnValueChanged += OnHealthChanged;
@@ -68,8 +72,33 @@ public class PlayerStats : NetworkBehaviour
     private void OnHealthChanged(float oldValue, float newValue)
     {
         healthBar.SetHealth(newValue, maxHealth);
+
+        if (newValue <= 0f && IsLocalPlayer)
+        {
+            // Show death menu
+            isDead = true;
+            DieServerRpc();
+        }
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void DieServerRpc()
+    {
+        DieClientRpc(OwnerClientId);
+    }
+
+    [ClientRpc]
+    private void DieClientRpc(ulong clientId)
+    {
+        if (!IsLocalPlayer) return;
+
+        if (deathMenuUI != null)
+            deathMenuUI.SetActive(true);
+
+        // Optional extras
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
     private void OnStaminaChanged(float oldValue, float newValue)
     {
         staminaBar.SetStamina(newValue, maxStamina);
